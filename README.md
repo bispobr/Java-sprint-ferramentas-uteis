@@ -1,200 +1,274 @@
-# API REST Gerenciamento de Ferramentas
+# API REST de Gerenciamento de Ferramentas
 
-## Descrição
+API REST desenvolvida em Java e Spring Boot para gerenciamento de ferramentas úteis. Cada ferramenta é cadastrada com título, link, descrição e tags, permitindo organizar e consultar recursos por categorias.
 
-API REST desenvolvidapara o gerenciamento de ferramentas, contendo as seguintes informações: **título**, **link**, **descrição** e **tags**. Inclui operações de listagem, filtragem por tag, cadastro e remoção de ferramentas, com persistência em banco de dados.  
+A aplicação possui autenticação baseada em JWT, controle de acesso com Spring Security, persistência em banco de dados, paginação, cache, auditoria e monitoramento.
 
+## Funcionalidades
 
-## 📝 Funcionalidades
+- Cadastro de ferramentas com título, link, descrição e tags.
+- Listagem de ferramentas.
+- Busca de ferramentas por uma ou mais tags.
+- Listagem paginada de ferramentas.
+- Atualização de ferramentas pelo identificador.
+- Remoção de ferramentas.
+- Registro e autenticação de usuários.
+- Autenticação baseada em JWT.
+- Controle de acesso por roles com Spring Security.
+- Padronização das respostas da API.
+- Validação dos dados recebidos.
+- Paginação e cache de consultas.
+- Auditoria de operações.
+- Logs estruturados em JSON.
+- Monitoramento com Spring Boot Actuator, Prometheus e Grafana.
+- Documentação interativa com OpenAPI e Swagger UI.
+- Migrações de banco de dados com Flyway.
+- Testes automatizados com JUnit e Mockito.
 
+## Tecnologias
 
-- Realiza operações C.R.U.D
-- Filtrar ferramentas:** permitir busca por uma *tag* específica.
-- Autenticação via JWT com endpoints protegidos por Spring Security e controle por roles (RBAC)
-- Padronização de respostas da API com wrapper (success, data, errors, meta)
-- Logs estruturados em JSON, métricas com Actuator, integração com Prometheus e dashboards no Grafana
-- Auditoria automática com classe de auditoria
-- Controle de acesso e rastreabilidade de operações sensíveis
-- CORS configurável por ambiente (origins, headers, métodos)
-- Suporte a profiles dev, test e prod com configurações isoladas
-- Migração de banco versionada com Flyway
-- Testes unitários  com JUnit 5 e Mockito
-- Documentação da API com Swagger/OpenAPI
-- Containerização com Docker e docker-compose
-- Uso de MapStruct para mapeamento entre DTOs e entidades
-- Lombok para redução de boilerplate
+- **Linguagem:** Java 21
+- **Framework:** Spring Boot 4
+- **API REST:** Spring Web e Bean Validation
+- **Segurança:** Spring Security e JWT
+- **Persistência:** Spring Data JPA
+- **Banco de dados:** PostgreSQL e H2
+- **Migrações:** Flyway
+- **Cache:** Spring Cache e Caffeine
+- **Mapeamento:** MapStruct
+- **Documentação:** Springdoc OpenAPI / Swagger UI
+- **Observabilidade:** Spring Boot Actuator, Micrometer, Prometheus e Grafana
+- **Logs:** Logstash Logback Encoder
+- **Testes:** Spring Boot Test, JUnit e Mockito
+- **Containerização:** Docker e Docker Compose
+- **Build:** Maven
+- **Utilitários:** Lombok
 
----
+## Requisitos
 
-
-## 🛠️ Tecnologias
-
-- Java 21 + Spring Boot
-- Spring Security + JWT
-- Spring Data JPA
-- PostgreSQL / H2
-- Flyway
-- MapStruct
-- Lombok
-- Actuator
-- Micrometer + Prometheus
-- Grafana
-- Swagger / OpenAPI
-- Docker
+- Java 21 ou superior
 - Maven
----
+- PostgreSQL para execução local
+- Docker e Docker Compose (opcionais)
 
-## 📦 Requisitos
+## Como executar
 
-- Java 21
-- Maven
-- PostgreSQL
-- Docker(opcional)
-
-## ▶️ Como Executar
-
-## Executando o Projeto (Sem docker)
+### Execução local
 
 1. Clone o repositório:
-```bash
-git https://github.com/bispobr/Java-spring-ferramentas-uteis.git
-```
-2. Configure o arquivo **.env** com as credenciais do seu ambiente.
-3. Execute a aplicação
 
----
+   ```bash
+   git clone https://github.com/bispobr/Java-sprint-ferramentas-uteis.git
+   ```
 
-## Executando com Docker (Opcional)
+2. Acesse o diretório:
 
-1. Gere a imagem Docker e inicie o container:
+   ```bash
+   cd Java-sprint-ferramentas-uteis
+   ```
+
+3. Configure as propriedades de conexão com o PostgreSQL conforme o perfil de execução utilizado.
+
+4. Inicie a aplicação com Maven:
+
+   ```bash
+   mvn spring-boot:run
+   ```
+
+### Execução com Docker Compose
+
+Na raiz do projeto, execute:
 
 ```bash
 docker compose up --build
 ```
----
 
-## Acessando a API (Localmente)
+O ambiente definido no Docker Compose inicia a aplicação, o PostgreSQL, o Prometheus e o Grafana.
 
-- **Base URL:** http://localhost:8080
-- **Documentação (Swagger):**  http://localhost:8080/swagger-ui/index.html#/
-- **Health Check (Actuator):**  http://localhost:8080/actuator/health
-- **Grafana (Docker):**  http://localhost:3000
-- usuario: admin
-- senha: admin
-- **Prometheus (Docker):**  http://localhost:9090
----
+Para encerrar os serviços:
 
-## Endpoints da API
+```bash
+docker compose down
+```
 
-### 🔑 Autenticação
+## Endpoints
 
-1. Registrar Usuário
+Os endpoints de gerenciamento de ferramentas são protegidos por autenticação. Após realizar o login, envie o token JWT no cabeçalho:
+
+```http
+Authorization: Bearer <token>
+```
+
+### Autenticação
+
+| Método | Endpoint | Descrição |
+| --- | --- | --- |
+| `POST` | `/auth/register` | Registra um usuário. |
+| `POST` | `/auth/login` | Autentica um usuário e retorna o token JWT. |
+
+#### Registrar usuário
+
+**Requisição**
 
 ```http
 POST /auth/register
 Content-Type: application/json
 ```
 
-Body
+**Corpo**
 
-```http
+```json
 {
-  "name": "string",
-  "email": "string",
-  "password": "string",
-  "role": "ROLE_ADMIN"
+  "name": "Nome do usuário",
+  "email": "usuario@example.com",
+  "password": "senha",
+  "role": "ROLE_USER"
 }
 ```
 
----
+#### Autenticar usuário
 
-1. Obter Token JWT
+**Requisição**
 
 ```http
 POST /auth/login
 Content-Type: application/json
 ```
 
-Body
+**Corpo**
+
+```json
+{
+  "email": "usuario@example.com",
+  "password": "senha"
+}
+```
+
+A resposta contém o token JWT utilizado para acessar os endpoints protegidos.
+
+### Gerenciamento de ferramentas
+
+| Método | Endpoint | Descrição |
+| --- | --- | --- |
+| `POST` | `/tools` | Cadastra uma ferramenta. |
+| `GET` | `/tools` | Lista ferramentas, com opção de filtragem por tags. |
+| `GET` | `/tools/paginated` | Lista ferramentas com paginação. |
+| `PUT` | `/tools/{id}` | Atualiza uma ferramenta pelo identificador. |
+| `DELETE` | `/tools/{id}` | Remove uma ferramenta pelo identificador. |
+
+#### Cadastrar ferramenta
+
+**Requisição**
 
 ```http
-{
- "email": "string",
-  "password": "string"
-}
-```
-
----
-
-1. **Usar token no Swagger**
-2. Clique em Authorize
-3. informe o token obtido
-
----
-**tool**
-
-1. **Cadastrar Ferramenta**
-
-```http request
 POST /tools
 Content-Type: application/json
+Authorization: Bearer <token>
 ```
 
-**Body**
+**Corpo**
 
-```http request
+```json
 {
-  "title": "string",
-  "link": "string",
-  "description": "string",
-  "tags": ["string"]
+  "title": "Ferramenta de exemplo",
+  "link": "https://example.com",
+  "description": "Descrição da ferramenta",
+  "tags": ["produtividade", "desenvolvimento"]
 }
 ```
-| Parâmetro | Tipo       | Descrição                           |
-|:----------| :--------- | :---------------------------------- |
-| `title`    | `String` |   Nome do ferramenta(**Obrigatório**)
-| `link`     | `String` |   URL da ferramenta(**Obrigatório**) 
-| `description`    | `String` |   Descricao da ferramenta(**Obrigatório**)
-| `tags`     | `String` |   Tags da ferrramenta(**Obrigatório**) 
 
-2. **Listar ferramentas**: Retorna a lista de ferramentas com paginação
+Campos:
 
-```http request
+- `title`: título da ferramenta, obrigatório.
+- `link`: endereço URL válido, obrigatório.
+- `description`: descrição da ferramenta, obrigatória.
+- `tags`: lista de tags com pelo menos um item.
+
+#### Listar ferramentas
+
+```http
+GET /tools
+Authorization: Bearer <token>
+```
+
+#### Filtrar por tags
+
+Para consultar ferramentas associadas a uma tag:
+
+```http
+GET /tools?tag=desenvolvimento
+```
+
+Também é possível informar múltiplas tags:
+
+```http
+GET /tools?tag=desenvolvimento&tag=produtividade
+```
+
+#### Listar ferramentas com paginação
+
+```http
 GET /tools/paginated?page=0&size=10
+Authorization: Bearer <token>
 ```
 
-3. **Listar ferramentas por tags**: Retorna a lista de ferramentas por tags
-#### busca Tag unica
-```http request
-GET /tools?tag=tag
-```
-#### busca multiplas  Tags 
-```http request
-GET /tools?tag=node&tag=web
-```
+- `page`: número da página, iniciado em zero. Padrão: `0`.
+- `size`: quantidade de registros por página. Padrão: `10`.
 
-4**Atualizar Ferramentas**
+#### Atualizar ferramenta
 
-```http request
-POST /tools/{id}
+```http
+PUT /tools/{id}
 Content-Type: application/json
+Authorization: Bearer <token>
 ```
-```
-**Body:**
-```http request
+
+**Corpo**
+
+```json
 {
-  "title": "string",
-  "link": "string",
-  "description": "string",
-  "tags": ["string"]
+  "title": "Ferramenta atualizada",
+  "link": "https://example.com",
+  "description": "Descrição atualizada",
+  "tags": ["utilidades"]
 }
 ```
 
-5. **Remover Cliente**
+Substitua `{id}` pelo identificador da ferramenta.
 
-```http request
+#### Remover ferramenta
+
+```http
 DELETE /tools/{id}
+Authorization: Bearer <token>
 ```
 
+Substitua `{id}` pelo identificador da ferramenta que deseja remover.
 
+## Documentação e monitoramento
 
+Com a aplicação em execução, os serviços ficam disponíveis nos endereços padrão abaixo:
+
+| Serviço | URL |
+| --- | --- |
+| API | http://localhost:8080 |
+| Swagger UI | http://localhost:8080/swagger-ui/index.html |
+| Actuator Health | http://localhost:8080/actuator/health |
+| Prometheus | http://localhost:9090 |
+| Grafana | http://localhost:3000 |
+
+O Swagger UI permite consultar os endpoints e testar as requisições. O acesso aos endpoints de monitoramento pode depender das configurações de segurança da aplicação.
+
+## Testes
+
+Para executar os testes automatizados:
+
+```bash
+mvn test
+```
+
+O projeto contém testes para os componentes de controller e service, utilizando a infraestrutura de testes do Spring Boot, JUnit e Mockito.
+
+## Estrutura do projeto
+
+O código está organizado por responsabilidades, incluindo controladores REST, DTOs, configuração, autenticação, tratamento de exceções, logs, mapeadores, modelos, repositórios e serviços. O projeto também contém migrações Flyway, configurações de aplicação, testes automatizados e arquivos de Docker e monitoramento.
