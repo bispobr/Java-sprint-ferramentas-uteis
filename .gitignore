@@ -305,3 +305,4 @@ $RECYCLE.BIN/
 .idea/jarRepositories.xml
 .idea/misc.xml
 mvnw
+.env
